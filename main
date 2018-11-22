@@ -1,0 +1,223 @@
+#include "stdafx.h"
+#include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <istream>
+
+class Matrix
+{
+public:
+	Matrix(int rows, int columns);
+	Matrix(std::string filename);
+	void addOne();
+	void changeSelectedCell(int row, int column, double newValue);
+	std::string getSelectedCell(int row, int column);
+	std::string getRow(int row);
+	std::string getColumn(int column);
+	std::string getMatrix();
+	void writeMatrixToFile(std::string FileName);
+	void transposition();
+private:
+	int rows;
+	int columns;
+	std::vector<std::vector <double>> data;
+};
+
+void Matrix::writeMatrixToFile(std::string fileName)
+{
+	std::ofstream outputFile(fileName);
+	if (!outputFile.is_open())
+		throw std::exception("Can't write");
+	std::string lineAsString = "";
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			lineAsString += std::to_string(data[i][j]) + ";";
+		}
+		outputFile << lineAsString << std::endl;
+		lineAsString = "";
+	}
+}
+
+
+std::vector<double> convert_string_to_vector(std::string input)
+{
+	std::vector<double> vecNumbers;
+	std::stringstream ss(input);
+	std::string indvString;
+	char sper = ';';
+
+	while (getline(ss, indvString, sper)) {
+		vecNumbers.push_back(stod(indvString));
+	}
+	return vecNumbers;
+}
+
+Matrix::Matrix(std::string filename)
+{
+	std::vector<std::vector <double>> dataman;
+	std::ifstream inputFile(filename);
+	if (!inputFile.is_open())
+		throw std::exception("No such file");
+	bool we_use_string = true;
+	if (we_use_string) {
+		std::string lineAsString;
+		while (!inputFile.eof()) {
+			inputFile >> lineAsString;
+			dataman.push_back(convert_string_to_vector(lineAsString));
+		}
+	}
+	this->data = dataman;
+	this->rows = dataman.size();
+	this->columns =dataman[0].size();
+
+}
+
+void Matrix::transposition()
+{
+	int trows = this->columns;
+	int tcolumns = this->rows;
+	int a = this->rows - 1;
+	std::vector<std::vector <double>> tdata;
+	for (int i = 0; i<trows; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<tcolumns; j++)
+		{
+			dataRow.push_back(0);
+		}
+		tdata.push_back(dataRow);
+	}
+	for (int i = 0; i < tcolumns; i++) {
+		for (int j = 0; j < trows; j++) {
+			tdata[j][a] = data[a][j];
+		}
+		a--;
+	}
+	this->rows = trows;
+	this->columns = tcolumns;
+	data = tdata;
+}
+
+
+std::string Matrix::getRow(int row)
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->columns; ++i)
+	{
+		std::cout << std::to_string(data[row][i]) + " ";
+	}
+	return ss.str();
+}
+
+
+std::string Matrix::getColumn(int column)
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; ++i)
+	{
+		ss << std::to_string(data[i][column]) + "\n";
+	}
+	return ss.str();
+}
+
+std::string Matrix::getSelectedCell(int row, int column)
+{
+	return std::to_string(data[row][column]);
+}
+
+
+std::string Matrix::getMatrix()
+{
+	std::stringstream ss;
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			ss << std::to_string(data[i][j]) + " ";
+		}
+		ss << "\n";
+	}
+	return ss.str();
+}
+
+
+void Matrix::addOne()
+{
+	for (int i = 0; i < this->rows; i++) {
+		for (int j = 0; j < this->columns; j++) {
+			data[i][j]++;
+		}
+	}
+}
+
+
+void Matrix::changeSelectedCell(int row, int column, double newValue)
+{
+	data[row][column] = newValue;
+}
+
+
+Matrix::Matrix(int rows, int columns)
+{
+	this->rows = rows;
+	this->columns = columns;
+	for (int i = 0; i<rows; i++)
+	{
+		std::vector <double> dataRow;
+		for (int j = 0; j<columns; j++)
+		{
+			dataRow.push_back(0);
+		}
+		data.push_back(dataRow);
+	}
+}
+
+
+
+int main()
+{
+
+	// Matrix one("test.txt");
+	// one.changeSelectedCell(0, 0, 7);
+	// std::cout << one.getMatrix();
+	// one.transposition();
+	// std::cout << std::endl;
+	// std::cout << one.getMatrix();
+
+	// Matrix one(6, 8);
+	// one.changeSelectedCell(0, 0, 1);
+	// one.changeSelectedCell(0, 1, 2);
+	// one.changeSelectedCell(0, 2, 3);
+	// one.changeSelectedCell(0, 3, 4);
+	// one.changeSelectedCell(0, 4, 5);
+	//
+	// one.changeSelectedCell(1, 0, 6);
+	// one.changeSelectedCell(1, 1, 7);
+	// one.changeSelectedCell(1, 2, 8);
+	// one.changeSelectedCell(1, 3, 9);
+	// one.changeSelectedCell(1, 4, 10);
+	//
+	// one.changeSelectedCell(2, 0, 2);
+	// one.changeSelectedCell(2, 1, 2);
+	// one.changeSelectedCell(2, 2, 2);
+	// one.changeSelectedCell(2, 3, 2);
+	// one.changeSelectedCell(2, 4, 2);
+	//
+	// one.changeSelectedCell(3, 0, 2);
+	// one.changeSelectedCell(3, 1, 2);
+	// one.changeSelectedCell(3, 2, 2);
+	// one.changeSelectedCell(3, 3, 2);
+	// one.changeSelectedCell(3, 4, 2);
+	// one.writeMatrixToFile("testing123.txt");
+	// std::cout << one.getMatrix();
+
+	// std::cout << one.getMatrix();
+	// std::cout << std::endl;
+	// one.transposition();
+	// std::cout << one.getMatrix();
+	getchar();
+
+    return 0;
+}
+
